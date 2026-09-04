@@ -1,0 +1,6 @@
+# Normalize line endings to LF for all text files (repo convention).
+* text=auto eol=lf
+
+# Binary assets stay untouched.
+*.png binary
+*.map text

@@ -1,0 +1,603 @@
+/* ============================================================================
+ * AV Glass theme layer — the Infinite Canvas single mother-material dark glass.
+ *
+ * CANONICAL global stylesheet — plain .css on purpose, NOT .module.css: the
+ * runtime stamps literal classes (.active, .av-pointer-active) that CSS-modules
+ * hashing would break. Renamed from glass.module.css on 2026-09-03; the former
+ * unmounted design master stays frozen.
+ *
+ * KNOWN GAP: the --dsw-glass-* host token contract is NOT defined here yet, so
+ * migrated consumers (ui-conversation, ui-attachment, ui-agent-preset, ...)
+ * run on their native fallbacks. Restore it from the frozen master design as its own
+ * verified change before any migrated-host work.
+ *
+ * Depth is Panel (24px blur) / Tool / Control / Compact-Nested (no blur).
+ * Every layer shares the SAME mother surface and mother shadow; only blur and
+ * hover semantics differ. Top-level controls get a hover-only specular sweep
+ * and a pointer-following spot (no idle animation).
+ * ========================================================================== */
+
+html[data-dsh-av-glass] {
+  color-scheme: dark;
+
+  --av-glass-x: 50%;
+  --av-glass-y: 0%;
+
+  --av-mother-edge: rgba(245, 252, 249, 0.062);
+  --av-mother-surface:
+    radial-gradient(ellipse 12px 66% at 0 0, rgba(0, 0, 0, 0.29), rgba(0, 0, 0, 0.12) 44%, transparent 100%),
+    radial-gradient(ellipse 18% 50% at 101% 72%, rgba(211, 239, 229, 0.095), transparent 76%),
+    radial-gradient(ellipse 64% 9% at 78% 101%, rgba(237, 248, 243, 0.21), rgba(179, 226, 214, 0.05) 44%, transparent 80%),
+    radial-gradient(ellipse 38% 10% at 14% 0%, rgba(255, 255, 255, 0.09), transparent 74%),
+    radial-gradient(ellipse 42% 27% at 103% 102%, rgba(179, 225, 213, 0.07), transparent 74%),
+    linear-gradient(153deg, rgba(31, 35, 37, 0.2) 0%, rgba(11, 14, 16, 0.24) 38%, rgba(4, 6, 8, 0.33) 100%);
+  --av-mother-shadow:
+    0 40px 96px rgba(0, 0, 0, 0.66),
+    0 12px 34px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.17),
+    inset 1px 0 0 rgba(239, 250, 246, 0.042),
+    inset 0 2px 0 rgba(0, 0, 0, 0.24),
+    inset 2px 0 0 rgba(0, 0, 0, 0.14),
+    inset 0 5px 0 rgba(235, 250, 244, 0.028),
+    inset 0 10px 15px rgba(232, 248, 241, 0.042),
+    inset 6px 0 11px rgba(211, 240, 231, 0.028),
+    inset -1px 0 0 rgba(202, 231, 221, 0.07),
+    inset 0 -2px 0 rgba(223, 242, 233, 0.14),
+    inset 0 -7px 12px rgba(184, 228, 216, 0.03),
+    inset 0 0 24px rgba(218, 242, 234, 0.03),
+    inset 1px 0 0 rgba(232, 249, 242, 0.05),
+    inset 3px 0 0 rgba(0, 0, 0, 0.12),
+    inset 6px 0 10px rgba(211, 241, 231, 0.038);
+
+  /* Vertical dock variant — insets only. The sidebar column (overflow hidden)
+   * clips every shadow painted by its descendants, so the two drops live on
+   * the column's own box instead; see the [data-dsh-sidebar] rule below. */
+  --av-mother-shadow-dock:
+    inset 0 1px 0 rgba(255, 255, 255, 0.17),
+    inset 1px 0 0 rgba(239, 250, 246, 0.042),
+    inset 0 2px 0 rgba(0, 0, 0, 0.24),
+    inset 2px 0 0 rgba(0, 0, 0, 0.14),
+    inset 0 5px 0 rgba(235, 250, 244, 0.028),
+    inset 0 10px 15px rgba(232, 248, 241, 0.042),
+    inset 6px 0 11px rgba(211, 240, 231, 0.028),
+    inset -1px 0 0 rgba(202, 231, 221, 0.07),
+    inset 0 -2px 0 rgba(223, 242, 233, 0.14),
+    inset 0 -7px 12px rgba(184, 228, 216, 0.03),
+    inset 0 0 24px rgba(218, 242, 234, 0.03),
+    inset 1px 0 0 rgba(232, 249, 242, 0.05),
+    inset 3px 0 0 rgba(0, 0, 0, 0.12),
+    inset 6px 0 10px rgba(211, 241, 231, 0.038);
+
+  /* All depth layers alias the one mother material. */
+  --av-mother-tool: var(--av-mother-surface);
+  --av-mother-tool-hover: var(--av-mother-surface);
+  --av-mother-tool-shadow: var(--av-mother-shadow);
+  --av-mother-control: var(--av-mother-surface);
+  --av-mother-control-hover: var(--av-mother-surface);
+  --av-mother-control-shadow: var(--av-mother-shadow);
+  --av-mother-control-hover-shadow: var(--av-mother-shadow);
+  --av-mother-surface-compact: var(--av-mother-surface);
+  --av-mother-surface-compact-hover: var(--av-mother-surface);
+  --av-mother-nested-shadow: var(--av-mother-shadow);
+  --av-mother-nested-shadow-hover: var(--av-mother-shadow);
+
+  --av-mother-text: rgba(238, 244, 240, 0.82);
+  --av-mother-text-strong: rgba(249, 252, 250, 0.96);
+  --av-mother-danger: rgba(255, 157, 169, 0.84);
+  --av-danger-copy: rgba(254, 202, 202, 0.96);
+  --av-danger-edge: rgba(248, 113, 113, 0.44);
+
+  --av-mother-panel-filter: blur(18px) saturate(1.18) brightness(1.04) contrast(1.04);
+  --av-mother-tool-filter: none;
+  --av-mother-control-filter: none;
+  --av-mother-control-light-filter: blur(12px) saturate(0.92);
+  --av-mother-compact-filter: blur(10px);
+  --av-mother-nested-filter: blur(8px);
+  /* Composer dock card — lighter frost than panels: its backdrop is live
+   * transcript text (high-frequency detail), where 18px reads as milk.
+   * Mirrors the reference canvas's control-light strength. */
+  --av-mother-dock-filter: blur(12px) saturate(1.18) brightness(1.04) contrast(1.04);
+}
+
+/* Backdrop auras — three large bright halos (left / bottom-right / top-right)
+ * plus a static grain tile. Glass only reads where a panel occludes an aura:
+ * the occluded part blurs, the bare part stays crisp — no occlusion, no glass.
+ * Everything static — no idle animation (GPU lesson). */
+/* Stage — the reference canvas (smart-canvas) backplate: solid #070809
+ * (--av-space-00), no auras, no grain. Glass reads only where real content
+ * sits behind a panel; over empty stage it is the canvas look. The aura
+ * stage below is the opt-in exception, default off. */
+html[data-dsh-av-glass] body {
+  background: rgb(7, 8, 9);
+  color: var(--av-mother-text);
+}
+
+/* Aura stage — opt-in backdrop light for the frost to bite on (settings
+ * sub-switch, default off; the pure-black stage stays the frozen default).
+ * A dedicated fixed layer, NOT a body background: body background
+ * propagation rendered unpredictably under the panel stack (log #16).
+ * Static gradients only — no idle animation (GPU lesson). Three spots ride
+ * the visible panel edges: left rides the sidebar edge (x=280px), the warm
+ * top-right dome centers above the viewport so its light sits inside the
+ * header band (the header only reads as glass with content behind it),
+ * bottom-right rides the composer. z-index -1 paints the layer above the
+ * body background and below every app node, so panel frosts sample it via
+ * backdrop-filter; the runtime injects it as body's first child on mount. */
+html[data-dsh-av-glass] .av-aura-stage {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle 680px at 280px 50%, rgba(110, 170, 225, 0.14), rgba(110, 170, 225, 0.09) 38%, transparent 82%),
+    radial-gradient(circle 700px at calc(50% + 307px) -12%, rgba(110, 170, 225, 0.2), rgba(110, 170, 225, 0.13) 38%, transparent 82%),
+    radial-gradient(circle 640px at calc(50% + 570px) 88%, rgba(110, 170, 225, 0.17), rgba(110, 170, 225, 0.11) 38%, transparent 82%);
+}
+
+html[data-dsh-av-glass][data-dsh-av-aura] .av-aura-stage {
+  display: block;
+}
+
+/* With content behind the glass, the sidebar frost aligns to the dock tier
+ * (12px) like the header and composer card — on the bare stage the tier
+ * difference is invisible, with auras it reads as a mismatch. Higher
+ * specificity (aura attribute) than the shared Panel ::before rule. */
+html[data-dsh-av-glass][data-dsh-av-aura] [data-dsh-sidebar-root]::before {
+  -webkit-backdrop-filter: var(--av-mother-dock-filter) !important;
+  backdrop-filter: var(--av-mother-dock-filter) !important;
+}
+
+/* Layout containers stay transparent. */
+html[data-dsh-av-glass] :is(
+  [data-dsh-frame],
+  [data-dsh-sidebar],
+  [data-dsh-center],
+  [data-dsh-composer]
+) {
+  background: transparent !important;
+}
+
+html[data-dsh-av-glass] [data-dsh-center] [data-phase] {
+  background: transparent !important;
+}
+
+/* Through-header transcript: the scroll body starts at the column top
+ * (negative margin pulls the clipped scrollport under the header band,
+ * padding puts content back below it), so the session header's frosted
+ * ::before has live text scrolling beneath it — glass only reads where a
+ * panel occludes content. scroll-padding keeps anchors/scroll-to-bottom
+ * landing clear of the 75px band. Plugin-side layout override; the host
+ * .header keeps its normal flow slot. */
+html[data-dsh-av-glass] [data-conversation-scroll] {
+  margin-top: -75px;
+  padding-top: 75px;
+  scroll-padding-top: 75px;
+}
+
+/* The header already paints above static flow (position: relative); raising
+ * z only guarantees it also covers the sticky composer (z:7) if a view ever
+ * scrolls one that far. */
+html[data-dsh-av-glass] [data-dsh-header] {
+  z-index: 8;
+}
+
+/* Panel tier — structural roots. Blur lives on ::before to avoid turning the
+ * root into a containing block for fixed-position descendants (settings). */
+html[data-dsh-av-glass] :is(
+  [data-dsh-sidebar-root],
+  [data-dsh-details],
+  [data-dsh-header]
+) {
+  position: relative;
+  border: 0 !important;
+  outline: 1px solid var(--av-mother-edge) !important;
+  outline-offset: -1px;
+  background: var(--av-mother-surface) !important;
+  box-shadow: var(--av-mother-shadow) !important;
+  color: var(--av-mother-text) !important;
+  border-radius: 16px;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+html[data-dsh-av-glass] :is(
+  [data-dsh-sidebar-root],
+  [data-dsh-details],
+  [data-dsh-header]
+)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
+  -webkit-backdrop-filter: var(--av-mother-panel-filter) !important;
+  backdrop-filter: var(--av-mother-panel-filter) !important;
+}
+
+/* Vertical dock (sidebar): the root keeps only the inset half of the mother
+ * material (the column clips its descendants), while the two drops are cast
+ * toward the content from the column's own box, which is never self-clipped. */
+html[data-dsh-av-glass] [data-dsh-sidebar-root] {
+  box-shadow: var(--av-mother-shadow-dock) !important;
+}
+
+html[data-dsh-av-glass] [data-dsh-sidebar] {
+  box-shadow:
+    28px 0 60px rgba(0, 0, 0, 0.42),
+    8px 0 18px rgba(0, 0, 0, 0.28) !important;
+}
+
+/* Header dock treatment — the top-docked header keeps only its bottom edge
+ * on-screen (top/left/right edge highlights are window-clipped), the same
+ * geometry the sidebar dock variant solves for a left dock. Three moves,
+ * no host edits:
+ * 1. Dock falloff: the surface's own bottom glow washes the only visible
+ *    edge out (measured +6/255 rim read vs the composer card's +49 top
+ *    rim); a dark falloff above the bottom edge restores its contrast.
+ * 2. Rim via the host token: the native header ::after hairline consumes
+ *    var(--dsw-glass-panel-border), undefined by the contract (KNOWN GAP
+ *    above), so its fallback paints a flat square-ended line across the
+ *    16px corners. Declaring the value on the ::after itself re-expresses
+ *    that same line as the bottom rim — steady along the straight span,
+ *    fading out across the corner radius. Scoped to the pseudo-element so
+ *    the global contract stays off (its own verified change, log #21).
+ * 3. Frost tier: like the composer card, the header sits over the live
+ *    transcript (through-header penetration), so it takes the dock frost,
+ *    not the panel strength. Same-specificity overrides: these rules must
+ *    stay AFTER the Panel-tier rules above. */
+html[data-dsh-av-glass] [data-dsh-header] {
+  box-shadow:
+    var(--av-mother-shadow),
+    inset 0 -10px 14px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-dsh-av-glass] [data-dsh-header]::after {
+  --dsw-glass-panel-border: linear-gradient(
+    90deg,
+    rgba(245, 252, 249, 0),
+    rgba(245, 252, 249, 0.26) 24px,
+    rgba(245, 252, 249, 0.26) calc(100% - 24px),
+    rgba(245, 252, 249, 0)
+  );
+}
+
+html[data-dsh-av-glass] [data-dsh-header]::before {
+  -webkit-backdrop-filter: var(--av-mother-dock-filter) !important;
+  backdrop-filter: var(--av-mother-dock-filter) !important;
+}
+
+/* Tool tier — cards and session rows inside panels: no extra blur. */
+html[data-dsh-av-glass] :is([class$='_card'], [class*='_card '], [class$='_sessionRow'], [class*='_sessionRow ']) {
+  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+  background: var(--av-mother-tool) !important;
+  box-shadow: var(--av-mother-tool-shadow) !important;
+  -webkit-backdrop-filter: var(--av-mother-tool-filter) !important;
+  backdrop-filter: var(--av-mother-tool-filter) !important;
+  color: var(--av-mother-text) !important;
+}
+
+/* Reply-card tier — tool call and command cards inside the conversation:
+ * their roots carry data-tool / data-state anchors but no card/bubble class
+ * name, so the Tool-tier catch-all never reached them. Scoped to the chat
+ * flow column so tool surfaces outside the transcript stay stock. */
+html[data-dsh-av-glass] [data-chat-flow] :is([data-tool], [data-state][class*='_root']) {
+  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+  background: var(--av-mother-tool) !important;
+  box-shadow: var(--av-mother-tool-shadow) !important;
+  -webkit-backdrop-filter: var(--av-mother-tool-filter) !important;
+  backdrop-filter: var(--av-mother-tool-filter) !important;
+  color: var(--av-mother-text) !important;
+  border-radius: 12px;
+  padding: 2px 10px 4px;
+}
+
+/* Dock tier — todo plan strip above the composer: tool material, no blur.
+ * data-testid is the stable host hook; the panel lives in the composer dock,
+ * outside [data-chat-flow], so no other tier reaches it. */
+html[data-dsh-av-glass] [data-testid='todo-panel'] {
+  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+  background: var(--av-mother-tool) !important;
+  box-shadow: var(--av-mother-tool-shadow) !important;
+  -webkit-backdrop-filter: var(--av-mother-tool-filter) !important;
+  backdrop-filter: var(--av-mother-tool-filter) !important;
+  color: var(--av-mother-text) !important;
+}
+
+/* The panel's full-width flat header button is native bare chrome
+ * (border:none, background:transparent): neutralize Control-tier material.
+ * Specificity invariant: this chain mirrors EVERY Control-tier :not clause
+ * plus one extra (:not([data-av-tone])), so it stays strictly above the
+ * Control base and hover rules at any clause count — when Control gains a
+ * clause, mirror it here. Same doctrine as the role=tab neutralizer. */
+html[data-dsh-av-glass] [data-testid='todo-panel'] button:not(
+  [class*='iconButton']
+):not([class*='searchButton']):not([class*='close']):not([class*='add']):not([data-disclosure-row]):not([class*='cardMain']):not([data-av-interaction]):not([class*='_brand']):not([role='tab']):not([class*='fileLink']):not([class*='fileMention']):not([aria-pressed]):not([class*='sessionOverflow']):not([data-av-tone]) {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Panel tier — leaf surfaces: dialogs, menus, tooltips, bubbles, composer card. */
+html[data-dsh-av-glass] :is(
+  [role='dialog'],
+  [role='menu'],
+  [role='tooltip'],
+  [class*='popover'],
+  [class*='dropdown'],
+  [class*='bubble'],
+  [class*='composerSeat'] [class*='card']
+) {
+  border: 0 !important;
+  outline: 1px solid var(--av-mother-edge) !important;
+  outline-offset: -1px;
+  background: var(--av-mother-surface) !important;
+  box-shadow: var(--av-mother-shadow) !important;
+  -webkit-backdrop-filter: var(--av-mother-panel-filter) !important;
+  backdrop-filter: var(--av-mother-panel-filter) !important;
+  color: var(--av-mother-text) !important;
+}
+
+/* Composer dock card override — the live transcript scrolls under this
+ * glass, so it takes the lighter dock frost, not the panel strength. Placed
+ * after the Panel tier: same selector specificity, later source order wins. */
+html[data-dsh-av-glass] [class*='composerSeat'] [class*='card'] {
+  -webkit-backdrop-filter: var(--av-mother-dock-filter) !important;
+  backdrop-filter: var(--av-mother-dock-filter) !important;
+}
+
+/* Control tier — text buttons and selectors. Exclusions leave native
+ * self-styled controls alone: toggle buttons ([aria-pressed]) keep their
+ * pressed-state styling, and session-overflow rows (sessionOverflow) are
+ * flat list-utility text rows by native design (role=tab doctrine). */
+html[data-dsh-av-glass] :is(button, [role='button']):not(
+  [class*='iconButton']
+):not([class*='searchButton']):not([class*='close']):not([class*='add']):not([data-disclosure-row]):not([class*='cardMain']):not([data-av-interaction]):not([class*='_brand']):not([role='tab']):not([class*='fileLink']):not([class*='fileMention']):not([aria-pressed]):not([class*='sessionOverflow']) {
+  border: 1px solid var(--av-mother-edge) !important;
+  background: var(--av-mother-control) !important;
+  box-shadow: var(--av-mother-control-shadow) !important;
+  -webkit-backdrop-filter: var(--av-mother-control-filter) !important;
+  backdrop-filter: var(--av-mother-control-filter) !important;
+  color: var(--av-mother-text-strong) !important;
+}
+
+/* Compact/Nested tier — icon-only and close/add controls. */
+html[data-dsh-av-glass] :is([class*='iconButton'], [class*='searchButton'], [class*='close'], [class$='_add'], [class*='_add ']) {
+  border: 1px solid var(--av-mother-edge) !important;
+  background: var(--av-mother-surface-compact) !important;
+  box-shadow: var(--av-mother-nested-shadow) !important;
+  -webkit-backdrop-filter: var(--av-mother-control-filter) !important;
+  backdrop-filter: var(--av-mother-control-filter) !important;
+  color: var(--av-mother-text-strong) !important;
+}
+
+/* Field inner inputs stay bare inside their glass frame. */
+html[data-dsh-av-glass] :is(input, textarea, select) {
+  border-color: var(--av-mother-edge) !important;
+  color: var(--av-mother-text-strong) !important;
+  background: transparent !important;
+}
+
+/* "Currently in use" preset badge: the host builds it as an inverse pair
+ * (background label-primary, text bg-layer-3) that goes washed-out under
+ * dark alias mapping in any theme, glass or not. Glass re-expresses it with
+ * the active accent pair — same mint language as the aria-pressed toggle. */
+html[data-dsh-av-glass] [class$='_inUse'] {
+  background: rgba(198, 233, 220, 0.14) !important;
+  color: rgba(198, 233, 220, 0.98) !important;
+}
+
+html[data-dsh-av-glass] :is(button, [role='button']):not([data-disclosure-row]):not([class*='cardMain']):not([data-av-interaction]):not([class*='_brand']):not([role='tab']):not([class*='fileLink']):not([class*='fileMention']):not([aria-pressed]):not([class*='sessionOverflow']):hover:not(:disabled) {
+  background: var(--av-mother-control-hover) !important;
+}
+
+/* ============================================================================
+ * Tier A top-level interaction — hover-only specular sweep + pointer spot.
+ * Matches Infinite Canvas static/js/glass-interaction.js: no idle animation.
+ * ========================================================================== */
+
+@keyframes av-top-specular-sweep {
+  from { transform: translateX(-38%); }
+  to { transform: translateX(38%); }
+}
+
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top'] {
+  --av-top-sweep: rgba(255, 255, 255, 0.62);
+  --av-top-sweep-opacity: 0.72;
+  --av-top-sweep-duration: 0.8s;
+  --av-top-spot-core: rgba(255, 255, 255, 0.3);
+  --av-top-spot-mid: rgba(255, 255, 255, 0.085);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden !important;
+  border: 0 !important;
+  outline: 1px solid var(--av-mother-edge) !important;
+  outline-offset: -1px;
+  color: var(--av-mother-text) !important;
+  background: var(--av-mother-surface-compact) !important;
+  background-size: auto;
+  box-shadow: var(--av-mother-nested-shadow) !important;
+  -webkit-backdrop-filter: var(--av-mother-control-filter) !important;
+  backdrop-filter: var(--av-mother-control-filter) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.38);
+  filter: none !important;
+  transform: none;
+  transition: outline-color 0.16s ease, color 0.16s ease, box-shadow 0.18s ease, background 0.18s ease !important;
+}
+
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top']::before {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+  inset: -40% -70% !important;
+  border-radius: inherit !important;
+  opacity: 0 !important;
+  background: linear-gradient(105deg, transparent 38%, var(--av-top-sweep) 49%, transparent 60%) !important;
+  filter: none !important;
+  transform: translateX(-38%);
+  animation: none !important;
+}
+
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top']::after {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  inset: 1px !important;
+  border-radius: inherit !important;
+  opacity: 0 !important;
+  background: radial-gradient(ellipse 112px 76px at var(--av-glass-x, 50%) var(--av-glass-y, 0%), var(--av-top-spot-core), var(--av-top-spot-mid) 31%, transparent 72%) !important;
+  transform: none !important;
+  animation: none !important;
+  transition: opacity 0.16s ease !important;
+}
+
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top'] > * {
+  position: relative;
+  z-index: 2;
+}
+
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top'] :is(svg, i) {
+  color: currentColor;
+  filter: none !important;
+}
+
+/* Hover / focus / selected resolve to the one lifted mother state. */
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top']:not(:disabled):not([aria-disabled='true']):not([aria-busy='true']):is(:hover, :focus-visible, .active, [aria-pressed='true'], [aria-selected='true'], [aria-expanded='true']) {
+  outline-color: rgba(245, 252, 249, 0.11);
+  color: var(--av-mother-text-strong) !important;
+  background: var(--av-mother-surface-compact-hover) !important;
+  box-shadow: var(--av-mother-nested-shadow-hover) !important;
+  transform: none !important;
+}
+
+/* Specular sweep appears only on hover / keyboard focus. */
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top']:not(:disabled):not([aria-disabled='true']):not([aria-busy='true']):is(:hover, :focus-visible)::before {
+  opacity: var(--av-top-sweep-opacity) !important;
+  animation: av-top-specular-sweep var(--av-top-sweep-duration) cubic-bezier(0.16, 1, 0.3, 1) both !important;
+}
+
+/* Pointer-following spot. */
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top'].av-pointer-active:not(:disabled):not([aria-disabled='true']):not([aria-busy='true']):hover::after {
+  opacity: 0.82 !important;
+}
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top']:focus-visible::after {
+  opacity: 0.52 !important;
+}
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top']:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.82) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.07), var(--av-mother-nested-shadow-hover) !important;
+}
+
+/* Pressed. */
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top']:not(:disabled):not([aria-disabled='true']):not([aria-busy='true']):active {
+  transform: translateY(0.75px) scale(0.988) !important;
+  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.42), inset 0 -1px 0 rgba(255, 255, 255, 0.075), 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Touch-only top entries: sweep, no pointer spot. */
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top'][data-av-pointer='off'] {
+  --av-top-sweep: rgba(255, 255, 255, 0.82);
+  --av-top-sweep-opacity: 0.9;
+  --av-top-sweep-duration: 0.92s;
+}
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top'][data-av-pointer='off']::after {
+  display: none !important;
+}
+
+/* Danger tone: semantic color, material never forks. */
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top'][data-av-tone='danger'] {
+  --av-top-sweep: rgba(255, 205, 214, 0.46);
+  --av-top-spot-core: rgba(255, 164, 178, 0.22);
+  --av-top-spot-mid: rgba(255, 126, 148, 0.07);
+  color: var(--av-danger-copy);
+  outline-color: var(--av-danger-edge);
+}
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top'][data-av-tone='danger']:not(:disabled):is(:hover, :focus-visible) {
+  color: var(--av-danger-copy) !important;
+  outline-color: var(--av-danger-edge) !important;
+}
+
+/* Disabled / busy. */
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top']:is(:disabled, [aria-disabled='true']) {
+  color: rgba(214, 214, 210, 0.34);
+  outline-color: rgba(245, 252, 249, 0.04);
+  box-shadow: var(--av-mother-nested-shadow) !important;
+  text-shadow: none !important;
+  filter: saturate(0.2);
+  transform: none !important;
+}
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top']:is(:disabled, [aria-disabled='true'], [aria-busy='true'], .loading, .is-loading, .running, .is-running)::before,
+html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top']:is(:disabled, [aria-disabled='true'], [aria-busy='true'], .loading, .is-loading, .running, .is-running)::after {
+  opacity: 0 !important;
+  animation: none !important;
+}
+
+/* Chrome-free stamped controls: view tabs are flat by native design (the
+ * 2px bottom indicator bar is their active feedback) — no Tier A chrome, no
+ * baseline frame. The :not() chain pads specificity above every Tier A rule. */
+html[data-dsh-av-glass] [data-av-interaction='top'][role='tab']:not([class*='iconButton']):not([class*='searchButton']):not([class*='close']):not([class*='add']):not([data-disclosure-row]):not([class*='cardMain']) {
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: 0 !important;
+}
+html[data-dsh-av-glass] [data-av-interaction='top'][role='tab']:not([class*='iconButton']):not([class*='searchButton']):not([class*='close']):not([class*='add']):not([data-disclosure-row]):not([class*='cardMain'])::before,
+html[data-dsh-av-glass] [data-av-interaction='top'][role='tab']:not([class*='iconButton']):not([class*='searchButton']):not([class*='close']):not([class*='add']):not([data-disclosure-row]):not([class*='cardMain'])::after {
+  display: none !important;
+}
+
+/* Selected tab: the neutralizer strips the native 2px underline indicator
+ * along with the tab chrome, leaving selection unmarked. Restore the native
+ * indicator language in white — a 2px bottom bar on the selected tab,
+ * brighter text above it; unselected tabs stay bare gray. */
+html[data-dsh-av-glass] [data-av-interaction='top'][role='tab'][aria-selected='true']:not([class*='iconButton']):not([class*='searchButton']):not([class*='close']):not([class*='add']):not([data-disclosure-row]):not([class*='cardMain']) {
+  position: relative;
+  color: var(--av-mother-text-strong) !important;
+}
+html[data-dsh-av-glass] [data-av-interaction='top'][role='tab'][aria-selected='true']:not([class*='iconButton']):not([class*='searchButton']):not([class*='close']):not([class*='add']):not([data-disclosure-row]):not([class*='cardMain'])::after {
+  content: '';
+  display: block !important;
+  position: absolute;
+  /* `top: auto` beats the Tier A spot's `inset: 1px !important` on this same
+   * ::after: with top+bottom+height all fixed, CSS drops `bottom` and the bar
+   * renders at the button's top edge across the label. */
+  top: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 1px !important;
+  height: 2px !important;
+  border-radius: 2px !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  opacity: 1 !important;
+  pointer-events: none;
+}
+
+/* General focus / selection. */
+html[data-dsh-av-glass] :focus-visible {
+  outline: 2px solid rgba(198, 233, 220, 0.85) !important;
+  outline-offset: 1px;
+}
+html[data-dsh-av-glass] ::selection {
+  background: rgba(198, 233, 220, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top'] {
+    transition: none !important;
+  }
+  html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top']::before {
+    opacity: 0 !important;
+    animation: none !important;
+  }
+  html[data-dsh-av-glass] :is(button, a)[data-av-interaction='top']::after {
+    opacity: 0 !important;
+    transition: none !important;
+  }
+}
