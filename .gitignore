@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Local rollback backups (not part of the shipped plugin)
+lib.bak/
+lib.p2bak/
+
+# Local-only tooling & acceptance notes
+check-css.cjs
+deploy.cjs
+ACCEPTANCE.md
+
+# Misc
+*.log
+.DS_Store
+Thumbs.db
+
+# Personal log (machine paths, account info) — never open-source this
+全局复利与踩坑日志.md
+
+# Internal design docs (local-only, never published)
+docs/视觉映射.md
+docs/glass-design-master.css
+
+# Build zips (release assets only, never in the tree)
+*.zip
