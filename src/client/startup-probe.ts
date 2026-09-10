@@ -41,7 +41,12 @@ export interface AVGlassProbe {
 
 const GLOBAL_KEY = '__avGlassProbe'
 
-type ProbeWindow = Window & Record<string, unknown>
+declare global {
+  interface Window {
+    /** The glass layer's startup-probe surface (installed three seconds after mount). */
+    __avGlassProbe?: AVGlassProbe
+  }
+}
 
 function collect(): AVGlassProbeReport {
   const seams = SEAMS.map((seam) => ({
@@ -53,7 +58,7 @@ function collect(): AVGlassProbeReport {
   // stateful controls (new-session, composer add) that may legitimately be
   // absent; their counts are informational and never raise the alarm.
   const missing = SEAMS.flatMap((seam, i) =>
-    seam.first === true && seams[i].hits === 0 ? [seam.attribute] : [])
+    seam.first === true && seams[i]?.hits === 0 ? [seam.attribute] : [])
   const trigger =
     document.querySelector(`[data-dsh-sidebar] ${SETTINGS_TRIGGER_SELECTOR}`)
     ?? document.querySelector(SETTINGS_TRIGGER_SELECTOR)
@@ -77,11 +82,11 @@ function runOnce(probe: AVGlassProbe): AVGlassProbeReport {
  */
 export function installStartupProbe(): void {
   const probe: AVGlassProbe = { run: () => runOnce(probe), last: null }
-  ;(window as ProbeWindow)[GLOBAL_KEY] = probe
+  window[GLOBAL_KEY] = probe
   runOnce(probe)
 }
 
 /** Remove the probe global (unmount: plugin off = stock UI, no plugin globals). */
 export function removeStartupProbe(): void {
-  delete (window as ProbeWindow)[GLOBAL_KEY]
+  delete window[GLOBAL_KEY]
 }

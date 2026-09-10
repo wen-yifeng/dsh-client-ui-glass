@@ -8,6 +8,8 @@
  * what makes the browser card render at all.
  */
 import z from '@deepseek-ai/schemastery'
+// Type-only: pulls the settings service's Context merge (ctx.settings).
+import type {} from '@deepseek-ai/dsh-settings'
 
 /** Settings namespace owned by this plugin (lowercase hyphenated id). */
 export const NAMESPACE = 'ui-av-glass'

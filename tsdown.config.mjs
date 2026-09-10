@@ -13,9 +13,8 @@
  * 0.1.3 migration changed src/index.ts, and a stale lib/index.js fails the
  * loader entry import at boot):
  * - client face (lib/client.js): CJS factory for the browser module table.
- * - node face (lib/index.js + lib/invariant.js): plain ESM loader entries
- *   (settings namespace registration + invariant companion); every bare
- *   specifier stays external.
+ * - node face (lib/index.js): plain ESM loader entry (settings namespace
+ *   registration); every bare specifier stays external.
  *
  * CSS split:
  * - `*.css` (global, e.g. glass.css) — compiled + minified, injected as a
@@ -25,9 +24,9 @@
  * - `*.module.css` (e.g. PluginCard.module.css) — CSS-modules transform with
  *   `[hash]_[local]` classes and a default class-map export for components.
  *
- * Rebuild: `cd` here and run `node deploy.cjs` (wraps tsdown + gates +
- * deploy). Plain .mjs on purpose: Node 22's native TS config loader has a
- * known parsing bug, so avoid a .ts config here.
+ * Rebuild: `cd` here and run tsdown with this config. Plain .mjs on purpose:
+ * Node 22's native TS config loader has a known parsing bug, so avoid a .ts
+ * config here.
  */
 import { readFile } from 'node:fs/promises'
 import { dirname, resolve as resolvePath } from 'node:path'
@@ -148,7 +147,7 @@ const clientConfig = {
 /** Host face: plain ESM loader entries; every bare specifier stays external. */
 const nodeConfig = {
   name: `${PLUGIN_ID}/node`,
-  entry: { index: 'src/index.ts', invariant: 'src/invariant.ts' },
+  entry: { index: 'src/index.ts' },
   outDir: 'lib',
   format: 'esm',
   platform: 'node',
