@@ -1,0 +1,6 @@
+# Local profile patch layer: registers the glass-mode client plugin into the
+# browser roster. For the local junction install, the profile's
+# cordis.patch.yml already carries the same entry.
+- insert:
+    - id: ui-glass
+      name: '@deepseek-ai/dsh-client-ui-glass'
