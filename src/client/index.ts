@@ -1,5 +1,9 @@
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type { BoundActions } from '@deepseek-ai/dsh-client-store'
+// Type-only: pulls the locale plugin's Context merge (ctx.locale).
+import type {} from '@deepseek-ai/dsh-client-locale/client'
+// Type-only: pulls the SlotRegistry service merge (ctx.slots).
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import { AVGlassPluginCard } from './PluginCard.tsx'
 import { createAVGlassCardStore, type AVGlassCardInjected } from './settings-store.ts'
 import { en, NS, zh } from './locales.ts'

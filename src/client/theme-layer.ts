@@ -195,12 +195,12 @@ export class AVGlassLayer {
   private auraImageUrl: string | null
   private auraBlur: boolean
   private hotkey: string
-  private auraStage?: HTMLElement
-  private tokenDisposer?: () => void
-  private interactionDisposer?: () => void
-  private seamDisposer?: () => void
-  private domWatcher?: DomWatcher
-  private probeTimer?: ReturnType<typeof setTimeout>
+  private auraStage: HTMLElement | undefined
+  private tokenDisposer: (() => void) | undefined
+  private interactionDisposer: (() => void) | undefined
+  private seamDisposer: (() => void) | undefined
+  private domWatcher: DomWatcher | undefined
+  private probeTimer: ReturnType<typeof setTimeout> | undefined
   private readonly listeners = new Set<() => void>()
 
   constructor(ctx: AVGlassContext) {

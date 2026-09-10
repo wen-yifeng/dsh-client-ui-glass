@@ -1,11 +1,25 @@
-import type { Context } from '@deepseek-ai/cordis';
-import type z from '@deepseek-ai/schemastery';
-
-/** Settings namespace owned by this plugin. */
-export declare const NAMESPACE: string;
-
+/**
+ * AV Glass theme-layer plugin, node half.
+ *
+ * The browser half ships via exports["./client"] and owns the whole visual
+ * layer. The host half exists so the settings surface can dispatch this
+ * plugin's card: `settings.plugin.item` is a keyed slot whose keys are
+ * settings namespaces served by the Host. Registering `ui-av-glass` here is
+ * what makes the browser card render at all.
+ */
+import z from '@deepseek-ai/schemastery';
+/** Settings namespace owned by this plugin (lowercase hyphenated id). */
+export declare const NAMESPACE = "ui-av-glass";
 /** Durable section: one master switch, on by default. */
-export declare const CONFIG: z.ZodType<{ enabled: boolean }, unknown, unknown>;
-
-/** Register the namespace when the settings service is present. */
-export declare function apply(ctx: Context): void;
+export declare const CONFIG: z<Schemastery.ObjectS<{
+    enabled: z<boolean, boolean>;
+}>, Schemastery.ObjectT<{
+    enabled: z<boolean, boolean>;
+}>>;
+/**
+ * Register the namespace when the settings service is present. The
+ * registration rides the plugin fiber, so it is removed on unload.
+ * @param ctx - cordis context.
+ */
+export declare function apply(ctx: import('@deepseek-ai/cordis').Context): void;
+//# sourceMappingURL=index.d.ts.map
